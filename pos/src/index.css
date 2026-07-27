@@ -8,6 +8,17 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  html[dir='rtl'] body {
+    direction: rtl;
+    font-family: Tahoma, Arial, sans-serif;
+  }
+
+  html[dir='rtl'] input,
+  html[dir='rtl'] textarea,
+  html[dir='rtl'] select {
+    text-align: right;
+  }
 }
 
 @layer utilities {

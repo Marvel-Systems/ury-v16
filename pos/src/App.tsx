@@ -1,16 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
-import Orders from './pages/Orders';
-import POS from './pages/POS';
-import Table from './pages/Table';
 import AuthGuard from './components/AuthGuard';
+import InitialLoader from './components/InitialLoader';
 import POSOpeningProvider from './components/POSOpeningProvider';
 import ScreenSizeProvider from './components/ScreenSizeProvider';
 import { ToastProvider } from '@ury/ui';
 import { usePOSStore } from './store/pos-store';
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { getActiveLanguage } from './i18n';
+
+const Orders = lazy(() => import('./pages/Orders'));
+const POS = lazy(() => import('./pages/POS'));
+const Table = lazy(() => import('./pages/Table'));
 
 function App() {
   const {
@@ -37,11 +39,13 @@ function App() {
               <div className="flex flex-col h-screen bg-gray-100 font-inter">
                 <Header />
                 <div className="flex-1 overflow-hidden">
-                  <Routes>
-                    <Route path="/" element={<POS/>} />
-                    <Route path="/orders" element={<Orders />} />
-                    <Route path="/table" element={<Table />} />
-                  </Routes>
+                  <Suspense fallback={<InitialLoader />}>
+                    <Routes>
+                      <Route path="/" element={<POS/>} />
+                      <Route path="/orders" element={<Orders />} />
+                      <Route path="/table" element={<Table />} />
+                    </Routes>
+                  </Suspense>
                 </div>
                 <Footer />
               </div>

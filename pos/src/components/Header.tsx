@@ -15,8 +15,10 @@ import { usePOSStore } from '../store/pos-store';
 import type { RootState } from '../store/root-store';
 import { logout } from '@ury/core';
 import { showToast } from '@ury/ui';
+import { getPOSBrand } from '../lib/branding';
 
 const Header = () => {
+  const brand = getPOSBrand();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const user = useRootStore((state: RootState) => state.user);
@@ -108,10 +110,14 @@ const Header = () => {
       <div className="flex items-center justify-between h-16 px-6">
         {/* Logo */}
         <div className="flex items-center">
-        <Link to="/" className="flex items-center gap-3">
+        <Link
+          to="/"
+          className="flex items-center gap-3 rounded-lg px-3 py-1"
+          style={{ backgroundColor: brand.logo_background || undefined }}
+        >
             <img 
-              src="/assets/ury/pos/ury_pos.png" 
-              alt="URY POS" 
+              src={brand.logo}
+              alt={brand.name}
               className="h-10 w-auto"
             />
           </Link>

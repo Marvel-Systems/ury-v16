@@ -1,7 +1,6 @@
 import json
 
 import frappe
-from ury.ury_pos.api import getBranch
 
 
 # Load JSON data or return as is if it's already a Python dictionary
@@ -59,17 +58,33 @@ def create_kot_doc(
             "order_no":order_number
         }
     )
-    branch = getBranch()
     if restaurant_table:
-        room = frappe.db.get_value("URY Table", restaurant_table, "restaurant_room")
-        restaurant = frappe.db.get_value("URY Table", restaurant_table, "restaurant")
-        menu = frappe.db.get_value("Menu for Room", {"room": room,"parent":restaurant}, "menu")
-        
+        room, restaurant = frappe.db.get_value(
+            "URY Table", restaurant_table, ["restaurant_room", "restaurant"]
+        )
+        menu = frappe.db.get_value(
+            "Menu for Room", {"room": room, "parent": restaurant}, "menu"
+        )
+        if not menu:
+            menu = frappe.db.get_value("URY Restaurant", restaurant, "active_menu")
     else:
-        menu = frappe.db.get_value("URY Restaurant", {"branch": branch}, "active_menu")
+        menu = frappe.db.get_value(
+            "URY Restaurant", {"branch": pos_invoice.branch}, "active_menu"
+        )
+
+    course_by_item = {
+        row.item: row.course
+        for row in frappe.get_all(
+            "URY Menu Item",
+            filters={
+                "parent": menu,
+                "item": ["in", [item["item_code"] for item in items]],
+            },
+            fields=["item", "course"],
+        )
+    }
 
     for item in items:
-        course = frappe.db.get_value("URY Menu Item", {"item": item["item_code"],"parent":menu}, "course")
         kot_doc.append(
             "kot_items",
             {
@@ -77,34 +92,29 @@ def create_kot_doc(
                 "item_name": item["item_name"],
                 "quantity": item["qty"],
                 "comments": item["comments"],
-                "course":course
+                "course": course_by_item.get(item["item_code"]),
             },
         )
     kot_doc.insert()
     kot_doc.submit()
 
-# Function to get all production item groups for a given branch
-def get_all_production_item_groups(branch):
-    productions = frappe.db.get_all(
-        "URY Production Unit", filters={"branch": branch}, fields=["name"]
+def get_production_item_groups(production_names):
+    if not production_names:
+        return {}
+
+    groups_by_production = {production_name: set() for production_name in production_names}
+    rows = frappe.get_all(
+        "URY Production Item Groups",
+        fields=["parent", "item_group"],
+        filters={
+            "parent": ["in", production_names],
+            "parenttype": "URY Production Unit",
+        },
+        order_by="idx",
     )
-    if productions:
-        all_production_item_groups = set()
-        for production in productions:
-            productionItemGroupslist = frappe.get_all(
-                "URY Production Item Groups",
-                fields=["item_group"],
-                filters={
-                    "parent": production.name,
-                    "parenttype": "URY Production Unit",
-                },
-                order_by="idx",
-            )
-            productionItemGroups = [
-                item_group.item_group for item_group in productionItemGroupslist
-            ]
-            all_production_item_groups.update(productionItemGroups)
-        return all_production_item_groups
+    for row in rows:
+        groups_by_production[row.parent].add(row.item_group)
+    return groups_by_production
 
 
 # Process items to create KOT documents
@@ -125,34 +135,31 @@ def process_items_for_kot(
     )
 
     if productions:
-        all_production_item_groups = get_all_production_item_groups(pos_profile.branch)
-        
-        # Iterate through each item and check if item group belongs to a production unit
+        production_names = [production.name for production in productions]
+        groups_by_production = get_production_item_groups(production_names)
+        all_production_item_groups = set().union(*groups_by_production.values())
+        item_group_by_code = {
+            row.name: row.item_group
+            for row in frappe.get_all(
+                "Item",
+                filters={"name": ["in", [item["item_code"] for item in kot_items]]},
+                fields=["name", "item_group"],
+            )
+        }
+
         for item in kot_items:
-            item_group = frappe.db.get_value("Item", item["item_code"], "item_group")
             item_code = item["item_code"]
+            item_group = item_group_by_code.get(item_code)
             if item_group not in all_production_item_groups:
                 frappe.msgprint(
                     f"Item group '{item_group}' for item '{item_code}' is not in any production."
                 )
         for production in productions:
-            productionItemGroupslist = frappe.get_all(
-                "URY Production Item Groups",
-                fields=["item_group"],
-                filters={
-                    "parent": production.name,
-                    "parenttype": "URY Production Unit",
-                },
-                order_by="idx",
-            )
-            productionItemGroups = [
-                item_group.item_group for item_group in productionItemGroupslist
-            ]
             production_items = [
                 item
                 for item in kot_items
-                if frappe.db.get_value("Item", item["item_code"], "item_group")
-                in productionItemGroups
+                if item_group_by_code.get(item["item_code"])
+                in groups_by_production[production.name]
             ]
 
             if production_items:
@@ -203,16 +210,23 @@ def process_items_for_cancel_kot(
         "URY Production Unit", filters={"branch": pos_profile.branch}, fields=["name"]
     )
 
+    production_names = [production.name for production in productions]
+    groups_by_production = get_production_item_groups(production_names)
+    item_group_by_code = {
+        row.name: row.item_group
+        for row in frappe.get_all(
+            "Item",
+            filters={"name": ["in", [item["item_code"] for item in kot_items]]},
+            fields=["name", "item_group"],
+        )
+    }
+
     for production in productions:
-        productionDoc = frappe.get_doc("URY Production Unit", production.name)
-        productionItemGroups = [
-            item_group.item_group for item_group in productionDoc.item_groups
-        ]
         production_items = [
             item
             for item in kot_items
-            if frappe.get_doc("Item", item["item_code"]).item_group
-            in productionItemGroups
+            if item_group_by_code.get(item["item_code"])
+            in groups_by_production[production.name]
         ]
 
         if production_items:

@@ -43,6 +43,24 @@ export interface CreateCustomerResponse {
   _server_messages?: string;
 }
 
+function getServerErrorMessage(error: unknown): string | null {
+  if (!error || typeof error !== 'object') return null;
+
+  const serverMessages = (error as { _server_messages?: unknown })._server_messages;
+  if (typeof serverMessages !== 'string') return null;
+
+  try {
+    const messages = JSON.parse(serverMessages) as string[];
+    const latestMessage = messages.at(-1);
+    if (!latestMessage) return null;
+
+    const parsed = JSON.parse(latestMessage) as { message?: string };
+    return parsed.message ?? null;
+  } catch {
+    return null;
+  }
+}
+
 
 export async function getCustomerGroups() {
   const groups = await db.getDocList(DOCTYPES.CUSTOMER_GROUP, {
@@ -79,6 +97,7 @@ export async function addCustomer(
     }
     return {
       data: {
+        name: msg.name,
         customer_name: msg.customer_name,
         mobile_number: msg.mobile_number,
         customer_group: msg.customer_group,
@@ -88,7 +107,7 @@ export async function addCustomer(
 
   } catch (error) {
     console.error('Error creating customer:', error);
-    throw error;
+    throw new Error(getServerErrorMessage(error) ?? (error instanceof Error ? error.message : 'Failed to create customer'));
   }
 }
 

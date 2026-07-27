@@ -671,7 +671,7 @@ export default function Orders() {
                         <p className="text-sm font-medium text-gray-900">{item.item_name}</p>
                         <p className="text-xs text-gray-500">{t('common.qty')}: {item.qty}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <p className="text-sm font-semibold text-gray-900">
                           {formatCurrency(item.amount)}
                         </p>
