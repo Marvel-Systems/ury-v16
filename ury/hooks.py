@@ -14,7 +14,7 @@ required_apps = ["erpnext"]
 add_to_apps_screen = [
   {
     "name": "ury",
-    "logo": "/assets/ury/Images/ury.png",
+    "logo": "https://alromansiah.sites.dev.muthhelerp.com/assets/ury/pos/alromansiah-logo.svg?v=20260727",
     "title": "URY",
     "route": "/desk/ury",
     "has_permission": "ury.permission.check_app_permission"
