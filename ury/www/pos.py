@@ -14,9 +14,10 @@ CLOSING_SCRIPT_TAG_PATTERN = re.compile(r"</script\>")
 
 def _get_pos_brand():
 	brand = {
-		"name": "URY POS",
-		"logo": "/assets/ury/pos/ury_pos.png",
-		"favicon": "/ury.ico",
+		"name": frappe.conf.get("ury_brand_name") or "URY POS",
+		"logo": frappe.conf.get("ury_brand_logo") or "/assets/ury/pos/ury_pos.png",
+		"favicon": frappe.conf.get("ury_brand_favicon") or "/ury.ico",
+		"logo_background": frappe.conf.get("ury_brand_logo_background"),
 	}
 	if frappe.session.user == "Guest":
 		return brand
@@ -31,8 +32,11 @@ def _get_pos_brand():
 		{
 			"name": company,
 			"logo": company_logo or brand["logo"],
-			"favicon": frappe.conf.get("ury_brand_favicon") or company_logo or brand["favicon"],
-			"logo_background": frappe.conf.get("ury_brand_logo_background"),
+			"favicon": (
+				brand["favicon"]
+				if frappe.conf.get("ury_brand_favicon")
+				else company_logo or brand["favicon"]
+			),
 		}
 	)
 	return brand
