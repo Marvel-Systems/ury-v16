@@ -51,7 +51,7 @@ const AuthGuard: React.FC<Props> = ({ children }) => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="text-red-600 text-xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Access Denied</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('errors.access_denied')}</h2>
           <p className="text-gray-600">{authError || configError}</p>
         </div>
       </div>
@@ -68,8 +68,8 @@ const AuthGuard: React.FC<Props> = ({ children }) => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="text-amber-600 text-xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Configuration Error</h2>
-          <p className="text-gray-600">POS Profile not found or not configured.</p>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('errors.configuration_error')}</h2>
+          <p className="text-gray-600">{t('errors.pos_profile_not_configured')}</p>
         </div>
       </div>
     );
@@ -80,9 +80,11 @@ const AuthGuard: React.FC<Props> = ({ children }) => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="text-amber-600 text-xl mb-4">🔒</div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Permission Required</h2>
-          <p className="text-gray-600">You do not have permission to access this application.</p>
-          <p className="text-sm text-gray-500 mt-2">Required roles: {posProfile.role_allowed_for_billing.map(r => r.role).join(', ')}</p>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('errors.permission_required')}</h2>
+          <p className="text-gray-600">{t('errors.permission_denied')}</p>
+          <p className="text-sm text-gray-500 mt-2">
+            {t('errors.required_roles', { roles: posProfile.role_allowed_for_billing.map(r => r.role).join(', ') })}
+          </p>
           <Button 
             variant="outline"
             className="mt-4"
@@ -96,7 +98,7 @@ const AuthGuard: React.FC<Props> = ({ children }) => {
             }}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            Recheck Permissions
+            {t('auth.recheck_permissions')}
           </Button>
         </div>
       </div>
@@ -106,4 +108,4 @@ const AuthGuard: React.FC<Props> = ({ children }) => {
   return <>{children}</>;
 };
 
-export default AuthGuard; 
+export default AuthGuard;

@@ -21,7 +21,13 @@
     "cancelling": "Cancelling...",
     "confirm_cancel": "Confirm Cancel",
     "loading_ury_pos": "Loading URY POS...",
-    "please_wait_setup": "Please wait while we set things up"
+    "please_wait_setup": "Please wait while we set things up",
+    "retry": "Retry",
+    "user": "User",
+    "qty": "Qty",
+    "search_menu_items": "Search menu items...",
+    "keyboard_navigation": "Use ↑↓ to navigate, Enter to select",
+    "no_rooms_for_branch": "No rooms found for this branch"
   },
   "header": {
     "search_placeholder_default": "Search orders, menu items, or customers...",
@@ -62,7 +68,9 @@
     "enter_cancel_reason": "Enter cancel reason",
     "print": "Print",
     "payment": "Payment",
-    "order_actions": "Order actions"
+    "order_actions": "Order actions",
+    "table_label": "Table {{table}}",
+    "edit_order": "Edit order"
   },
   "payment": {
     "title": "Payment",
@@ -136,7 +144,19 @@
     "discount_exceeds_max": "Percentage discount cannot exceed 100%",
     "please_print_first": "Please print invoice before making payment",
     "enter_cancel_reason": "Please enter a reason for cancellation.",
-    "dine_in_restricted": "Dine In is not available for your role"
+    "dine_in_restricted": "Dine In is not available for your role",
+    "access_denied": "Access Denied",
+    "configuration_error": "Configuration Error",
+    "pos_profile_not_configured": "POS Profile not found or not configured.",
+    "permission_required": "Permission Required",
+    "permission_denied": "You do not have permission to access this application.",
+    "required_roles": "Required roles: {{roles}}",
+    "failed_load_orders": "Failed to load orders",
+    "failed_load_order_details": "Failed to load order details",
+    "failed_load_pos": "Failed to load POS",
+    "api_error": "API error",
+    "failed_fetch_item_details": "Failed to fetch item details",
+    "failed_fetch_addons": "Failed to fetch add-ons"
   },
   "success": {
     "order_cancelled": "Order cancelled successfully",
@@ -233,7 +253,17 @@
     "no_destination_tables": "No vacant tables available in this branch",
     "transfer_not_for_merged": "Table transfer is not allowed for merged tables. Unmerge first.",
     "order_already_billed": "This order has already been billed",
-    "no_captains_found": "No captains found"
+    "no_captains_found": "No captains found",
+    "zoom_in": "Zoom in",
+    "zoom_out": "Zoom out",
+    "reset_zoom_pan": "Reset zoom and pan"
+  },
+  "aggregator": {
+    "loading": "Loading aggregators...",
+    "select": "Select an aggregator"
+  },
+  "auth": {
+    "recheck_permissions": "Recheck Permissions"
   },
   "bill_split": {
     "split_bill": "Split bill",

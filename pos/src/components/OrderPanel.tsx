@@ -133,9 +133,9 @@ const OrderPanel = () => {
         try {
           const messages = JSON.parse((error as any)._server_messages);
           const messageObj = JSON.parse(messages[0]);
-          showToast.error(messageObj.message || 'API error');
+          showToast.error(messageObj.message || t('errors.api_error'));
         } catch {
-          showToast.error('API error');
+          showToast.error(t('errors.api_error'));
         }
       } else if (error instanceof Error) {
         showToast.error(error.message);
@@ -351,4 +351,4 @@ const OrderPanel = () => {
   );
 };
 
-export default OrderPanel; 
+export default OrderPanel;

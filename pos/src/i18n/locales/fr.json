@@ -21,7 +21,13 @@
     "cancelling": "Annulation en cours...",
     "confirm_cancel": "Confirmer l'annulation",
     "loading_ury_pos": "Chargement de URY POS...",
-    "please_wait_setup": "Veuillez patienter pendant que nous préparons tout"
+    "please_wait_setup": "Veuillez patienter pendant que nous préparons tout",
+    "retry": "Réessayer",
+    "user": "Utilisateur",
+    "qty": "Qté",
+    "search_menu_items": "Rechercher des articles du menu...",
+    "keyboard_navigation": "Utilisez ↑↓ pour naviguer, Entrée pour sélectionner",
+    "no_rooms_for_branch": "Aucune salle trouvée pour cet établissement"
   },
   "header": {
     "search_placeholder_default": "Rechercher commandes, articles ou clients...",
@@ -62,7 +68,9 @@
     "enter_cancel_reason": "Saisir le motif d'annulation",
     "print": "Imprimer",
     "payment": "Paiement",
-    "order_actions": "Actions sur la commande"
+    "order_actions": "Actions sur la commande",
+    "table_label": "Table {{table}}",
+    "edit_order": "Modifier la commande"
   },
   "payment": {
     "title": "Paiement",
@@ -136,7 +144,19 @@
     "discount_exceeds_max": "La remise en pourcentage ne peut pas dépasser 100 %",
     "please_print_first": "Veuillez imprimer la facture avant d'effectuer le paiement",
     "enter_cancel_reason": "Veuillez entrer un motif d'annulation.",
-    "dine_in_restricted": "La consommation sur place n'est pas disponible pour votre rôle"
+    "dine_in_restricted": "La consommation sur place n'est pas disponible pour votre rôle",
+    "access_denied": "Accès refusé",
+    "configuration_error": "Erreur de configuration",
+    "pos_profile_not_configured": "Profil de point de vente introuvable ou non configuré.",
+    "permission_required": "Autorisation requise",
+    "permission_denied": "Vous n'avez pas l'autorisation d'accéder à cette application.",
+    "required_roles": "Rôles requis : {{roles}}",
+    "failed_load_orders": "Échec du chargement des commandes",
+    "failed_load_order_details": "Échec du chargement des détails de la commande",
+    "failed_load_pos": "Échec du chargement du point de vente",
+    "api_error": "Erreur de l'API",
+    "failed_fetch_item_details": "Échec du chargement des détails de l'article",
+    "failed_fetch_addons": "Échec du chargement des suppléments"
   },
   "success": {
     "order_cancelled": "Commande annulée avec succès",
@@ -233,7 +253,17 @@
     "no_destination_tables": "Aucune table libre disponible dans cet établissement",
     "transfer_not_for_merged": "Le transfert de table n'est pas autorisé pour les tables fusionnées. Séparez d'abord les tables.",
     "order_already_billed": "Cette commande a déjà été facturée",
-    "no_captains_found": "Aucun capitaine trouvé"
+    "no_captains_found": "Aucun capitaine trouvé",
+    "zoom_in": "Zoom avant",
+    "zoom_out": "Zoom arrière",
+    "reset_zoom_pan": "Réinitialiser le zoom et le déplacement"
+  },
+  "aggregator": {
+    "loading": "Chargement des agrégateurs...",
+    "select": "Sélectionner un agrégateur"
+  },
+  "auth": {
+    "recheck_permissions": "Revérifier les autorisations"
   },
   "bill_split": {
     "split_bill": "Diviser l'addition",

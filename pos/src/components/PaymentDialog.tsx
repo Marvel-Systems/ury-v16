@@ -150,7 +150,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
       });
       // Show toast and reload orders (assume showToast and reload available globally)
       if (typeof window !== 'undefined' && (window as any).showToast) {
-        (window as any).showToast.success('Payment successful');
+        (window as any).showToast.success(t('success.payment_successful'));
       }
       onClose();
       clearSelectedOrder();
@@ -309,4 +309,4 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
   );
 };
 
-export default PaymentDialog; 
+export default PaymentDialog;
