@@ -12,6 +12,36 @@ SCRIPT_TAG_PATTERN = re.compile(r"\<script[^<]*\</script\>")
 CLOSING_SCRIPT_TAG_PATTERN = re.compile(r"</script\>")
 
 
+def _get_pos_brand():
+	brand = {
+		"name": frappe.conf.get("ury_brand_name") or "URY POS",
+		"logo": frappe.conf.get("ury_brand_logo") or "/assets/ury/pos/ury_pos.png",
+		"favicon": frappe.conf.get("ury_brand_favicon") or "/ury.ico",
+		"logo_background": frappe.conf.get("ury_brand_logo_background"),
+	}
+	if frappe.session.user == "Guest":
+		return brand
+
+	branch = frappe.db.get_value("URY User", {"user": frappe.session.user}, "parent")
+	company = frappe.db.get_value("POS Profile", {"branch": branch, "disabled": 0}, "company")
+	if not company:
+		return brand
+
+	company_logo = frappe.db.get_value("Company", company, "company_logo")
+	brand.update(
+		{
+			"name": company,
+			"logo": company_logo or brand["logo"],
+			"favicon": (
+				brand["favicon"]
+				if frappe.conf.get("ury_brand_favicon")
+				else company_logo or brand["favicon"]
+			),
+		}
+	)
+	return brand
+
+
 def get_context(context):
 	csrf_token = frappe.sessions.get_csrf_token()
 	# Manually commit the CSRF token here
@@ -31,6 +61,7 @@ def get_context(context):
 	else:
 		enabled = True
 	boot["server_script_enabled"] = enabled
+	boot["ury_brand"] = _get_pos_brand()
 
 	boot_json = frappe.as_json(boot, indent=None, separators=(",", ":"))
 	boot_json = SCRIPT_TAG_PATTERN.sub("", boot_json)
@@ -58,6 +89,7 @@ def get_boot():
 		raise frappe.SessionBootFailed from e
 
 	boot["push_relay_server_url"] = frappe.conf.get("push_relay_server_url")
+	boot["ury_brand"] = _get_pos_brand()
 	boot_json = frappe.as_json(boot, indent=None, separators=(",", ":"))
 	boot_json = SCRIPT_TAG_PATTERN.sub("", boot_json)
 

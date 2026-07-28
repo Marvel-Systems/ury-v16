@@ -237,8 +237,8 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
                 {formatCurrency(paymentsTotal)} / {formatCurrency(finalTotal)}
                 {paymentsTotal > finalTotal && (
                   <span className="text-yellow-700 font-semibold">
-                    <Coins className="inline w-4 h-4 ml-1 text-yellow-500" />
-                    <span className="text-yellow-500 font-bold ml-1">{formatCurrency(paymentsTotal - finalTotal)}</span>
+                    <Coins className="inline w-4 h-4 ms-1 text-yellow-500" />
+                    <span className="text-yellow-500 font-bold ms-1">{formatCurrency(paymentsTotal - finalTotal)}</span>
                   </span>
                 )}
               </span>

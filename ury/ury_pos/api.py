@@ -856,44 +856,58 @@ def getAggregatorMOP(aggregator):
             {"mode_of_payment": modeOfPayment, "opening_amount": float(0)}
     )
     return modeOfPaymentsList
-@frappe.whitelist()
-def create_customer(customer_name, mobile_number=None, customer_group="Individual", territory="India"):
+def _resolve_customer_default(doctype, requested_value, settings_field):
+    if requested_value and frappe.db.exists(doctype, requested_value):
+        return requested_value
+
+    configured_value = frappe.db.get_single_value("Selling Settings", settings_field)
+    if configured_value and frappe.db.exists(doctype, configured_value):
+        return configured_value
+
+    leaf_value = frappe.db.get_value(doctype, {"is_group": 0}, "name")
+    if leaf_value:
+        return leaf_value
+
+    frappe.throw(_("Please configure a default {0} in Selling Settings.").format(_(doctype)))
+
+
+@frappe.whitelist(methods=["POST"])
+def create_customer(customer_name: str, mobile_number: str, customer_group=None, territory=None):
     if not customer_name:
-        frappe.throw("Customer name is required")
+        frappe.throw(_("Customer name is required"))
     if not mobile_number:
-        frappe.throw("Mobile Number is required")
+        frappe.throw(_("Mobile Number is required"))
     try:
         validate_phone_number(mobile_number, throw=True)
     except Exception:
-        frappe.throw("Invalid mobile number format")
+        frappe.throw(_("Invalid mobile number format"))
 
-    """Create a new customer"""
+    customer_group = _resolve_customer_default(
+        "Customer Group", customer_group, "customer_group"
+    )
+    territory = _resolve_customer_default("Territory", territory, "territory")
+
     try:
         customer = frappe.get_doc({
             "doctype": "Customer",
-            "customer_name": customer_name,
-            "mobile_number": mobile_number,
+            "customer_name": customer_name.strip(),
+            "mobile_number": mobile_number.strip(),
             "customer_group": customer_group,
             "territory": territory
         })
         customer.insert(ignore_permissions=True)
-        frappe.db.commit()
-
         return {
             "status": "success",
-            "message": "Customer created successfully",
-            "customer_name": customer_name,
-            "mobile_number": mobile_number,
+            "message": _("Customer created successfully"),
+            "name": customer.name,
+            "customer_name": customer.customer_name,
+            "mobile_number": customer.mobile_number,
             "customer_group": customer_group,
             "territory": territory
         }
-
-    except Exception as e:
-        frappe.log_error(message=frappe.get_traceback(), title="Customer Creation Failed")
-        return {
-            "status": "error",
-            "message": str(e)
-        }
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), _("Customer Creation Failed"))
+        raise
 
 @frappe.whitelist()
 def validate_pos_close(pos_profile): 

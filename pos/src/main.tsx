@@ -2,18 +2,15 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import { initI18n } from './i18n'
-import { initPrinting } from '@ury/core'
-import { privateKey } from '../privateKey'
-
-initPrinting({ signKey: privateKey })
+import { applyDocumentLocale, initI18n } from './i18n'
+import { applyBranding } from './lib/branding'
 
 initI18n().then(() => {
+  applyDocumentLocale()
+  applyBranding()
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App />
     </StrictMode>,
   )
 })
-
-  

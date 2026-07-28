@@ -853,8 +853,7 @@ def sync_order(
     if order_type:
         invoice.order_type = order_type
 
-    customerdoc = frappe.get_doc("Customer", customer)
-    invoice.mobile_number = customerdoc.mobile_number
+    invoice.mobile_number = frappe.db.get_value("Customer", customer, "mobile_number")
     if comments:
         invoice.custom_comments = comments
     invoice.no_of_pax = no_of_pax
@@ -902,39 +901,56 @@ def sync_order(
     if isinstance(items, str):
         items = json.loads(items)
     invoice.items = []
-    
+
     menu = frappe.db.get_value("URY Menu", {"branch": invoice.branch}, "name")
-   
-    for d in items:
-        
-        course = frappe.db.get_value("URY Menu Item", {"item": d.get("item"),"parent":menu}, "course")
-        
-        item_prices = frappe.db.get_list(
-            "Item Price",
-            filters={"item_code": d.get("item"), "price_list": price_list},
-            fields=["price_list_rate"],
+
+    item_codes = list(dict.fromkeys(d.get("item") for d in items if d.get("item")))
+    if not item_codes:
+        frappe.throw(_("Please add at least one item to the order."))
+
+    course_by_item = {
+        row.item: row.course
+        for row in frappe.get_all(
+            "URY Menu Item",
+            filters={"parent": menu, "item": ["in", item_codes]},
+            fields=["item", "course"],
+        )
+    }
+    rate_by_item = {}
+    item_prices = frappe.get_all(
+        "Item Price",
+        filters={"item_code": ["in", item_codes], "price_list": price_list},
+        fields=["item_code", "price_list_rate"],
+        order_by="valid_from desc, creation desc",
+    )
+    for item_price in item_prices:
+        rate_by_item.setdefault(item_price.item_code, item_price.price_list_rate)
+    missing_prices = [item_code for item_code in item_codes if item_code not in rate_by_item]
+    if missing_prices:
+        frappe.throw(
+            _("No item price found for Items: {0} in Price List: {1}. Please check the price list settings.").format(
+                ", ".join(missing_prices), price_list
+            )
         )
 
-        if not item_prices:
-            frappe.throw(_("No item price found for Item: {0} in Price List: {1}. Please check the price list settings.").format(d.get("item"), price_list))
-
-        else:
-            invoice.append(
-                "items",
-                dict(
-                    item_code=d.get("item"),
-                    item_name=d.get("item_name"),
-                    qty=d.get("qty"),
-                    **({"custom_course": course} if course else {}),
-                    comment=d.get("comment"),
-                    rate = item_prices[0].price_list_rate,
-                    price_list_rate = item_prices[0].price_list_rate,
-                    base_price_list_rate = item_prices[0].price_list_rate,
-                    cost_center = frappe.db.get_value(
-                        "POS Profile", pos_profile, "cost_center"
-                        ),
-                ),
-            )
+    for d in items:
+        item_code = d.get("item")
+        rate = rate_by_item[item_code]
+        course = course_by_item.get(item_code)
+        invoice.append(
+            "items",
+            dict(
+                item_code=item_code,
+                item_name=d.get("item_name"),
+                qty=d.get("qty"),
+                **({"custom_course": course} if course else {}),
+                comment=d.get("comment"),
+                rate=rate,
+                price_list_rate=rate,
+                base_price_list_rate=rate,
+                cost_center=posprofile.cost_center,
+            ),
+        )
 
     try:
         invoice.save()

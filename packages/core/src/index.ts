@@ -4,4 +4,3 @@ export { isUserRestrictedFromTableOrders, canCaptainTransfer } from './frappe/ro
 export type { User, PosProfileCombined } from './types';
 export { storage } from './storage';
 export { formatCurrency, formatInvoiceTime } from './format';
-export { initPrinting, loadQzPrinter, disconnectQzPrinter, printWithQz } from './print/qz';

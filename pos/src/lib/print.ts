@@ -1,4 +1,4 @@
-import { printWithQz } from '@ury/core';
+import { privateKey } from '../../privateKey';
 import {
   getInvoicePrintHtml,
   networkPrint,
@@ -22,6 +22,8 @@ export async function printOrder({ orderId, posProfile, printFormat }: PrintOrde
       throw new Error('QZ host is not set');
     }
     const html = await getInvoicePrintHtml(orderId, format as string);
+    const { initPrinting, printWithQz } = await import('@ury/core/printing');
+    initPrinting({ signKey: privateKey });
     await printWithQz(qz_host, html);
     await updatePrintStatus(orderId);
     return 'qz';

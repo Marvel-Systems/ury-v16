@@ -20,7 +20,8 @@
     "checking_pos_status": "Checking POS status...",
     "cancelling": "Cancelling...",
     "confirm_cancel": "Confirm Cancel",
-    "loading_ury_pos": "Loading URY POS...",
+    "loading_ury_pos": "Loading POS...",
+    "loading_pos": "Loading point of sale...",
     "please_wait_setup": "Please wait while we set things up",
     "retry": "Retry",
     "user": "User",
@@ -114,6 +115,16 @@
     "adding": "Adding Customer...",
     "add_button": "Add Customer",
     "failed_create": "Failed to create customer. Please try again."
+  },
+  "screen_size": {
+    "title": "Desktop Only",
+    "description": "This point of sale is designed for desktop computers and large tablets.",
+    "minimum_width": "Please use a device with a screen width of 1024px or larger.",
+    "current_width": "Current screen width",
+    "required": "Required",
+    "required_value": "1024px or larger",
+    "mobile_alternative": "You can use the classic point of sale on mobile devices.",
+    "switch_version": "Switch to Classic Version"
   },
   "comment": {
     "title": "Order Comments",
